@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-Configuration/configuration-custom-database" data-has-hydrated="false">
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-Develop/configuration-custom-database" data-has-hydrated="false">
 <head>
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.8.1">
@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://www.googletagmanager.com">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-SLQFLQ3KPT"></script>
 <script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-SLQFLQ3KPT",{})</script>
+
 
 
 
@@ -22,9 +23,9 @@
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@550;600&amp;display=swap">
 <script>!function(){window.semaphore=window.semaphore||[],window.ketch=function(){window.semaphore.push(arguments)};var e=document.createElement("script");e.type="text/javascript",e.src="https://global.ketchcdn.com/web/v3/config/datastax/langflow_org_web/boot.js",e.defer=e.async=!0,document.getElementsByTagName("head")[0].appendChild(e)}()</script>
-<script defer="true">!function(){const e=e=>{if(window.gtag&&e.purposes&&"analytics"in e.purposes&&"targeted_advertising"in e.purposes){const n=!0===e.purposes.analytics?"granted":"denied",t=!0===e.purposes.targeted_advertising?"granted":"denied",a={analytics_storage:n,ad_personalization:t,ad_storage:t,ad_user_data:t};window.gtag("consent","update",a)}};window.ketch&&window.ketch("on","consent",e)}()</script><link rel="stylesheet" href="/assets/css/styles.79069821.css">
-<script src="/assets/js/runtime~main.633c2879.js" defer="defer"></script>
-<script src="/assets/js/main.21a2a8f9.js" defer="defer"></script>
+<script defer="true">!function(){const e=e=>{if(window.gtag&&e.purposes&&"analytics"in e.purposes&&"targeted_advertising"in e.purposes){const n=!0===e.purposes.analytics?"granted":"denied",t=!0===e.purposes.targeted_advertising?"granted":"denied",a={analytics_storage:n,ad_personalization:t,ad_storage:t,ad_user_data:t};window.gtag("consent","update",a)}};window.ketch&&window.ketch("on","consent",e)}()</script><link rel="stylesheet" href="/assets/css/styles.5b49702d.css">
+<script src="/assets/js/runtime~main.e18a1e08.js" defer="defer"></script>
+<script src="/assets/js/main.96d99950.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;"><defs>
@@ -73,17 +74,35 @@ Langflow can more efficiently handle multiple users and larger workloads by usin
 </ul>
 </li>
 <li>
-<p>Create a Langflow <code>.env</code> file:</p>
+<p>Edit or create a Langflow <code>.env</code> file:</p>
 <div class="ch-codeblock not-prose" data-ch-theme="github-dark"><div class="ch-code-wrapper ch-code" data-ch-measured="false"><code class="ch-code-scroll-parent"><br><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>touch .env</span></div></div><br></code></div></div>
 <p>You can use the <a href="https://github.com/langflow-ai/langflow/blob/main/.env.example" target="_blank" rel="noopener noreferrer"><code>.env.example</code></a> file in the Langflow repository as a template for your own <code>.env</code> file.</p>
 </li>
 <li>
 <p>In your <code>.env</code> file, set <code>LANGFLOW_DATABASE_URL</code> to your PostgreSQL connection string:</p>
 <div class="ch-codeblock not-prose" data-ch-theme="github-dark"><div class="ch-code-wrapper ch-code" data-ch-measured="false"><code class="ch-code-scroll-parent"><br><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>LANGFLOW_DATABASE_URL=&quot;postgresql://user:password@localhost:5432/dbname&quot;</span></div></div><br></code></div></div>
+<p>Langflow uses <a href="https://www.sqlalchemy.org/" target="_blank" rel="noopener noreferrer">SQLAlchemy</a> with the <a href="https://www.psycopg.org/" target="_blank" rel="noopener noreferrer">psycopg</a> driver to pass SSL parameters directly to the PostgreSQL connection. The following SSL modes are supported:</p>
+<ul>
+<li>
+<p><strong><code>sslmode=require</code></strong>: Requires SSL connection but doesn&#x27;t verify server certificate. This option is the least secure, but acceptable for most use cases.</p>
+<div class="ch-codeblock not-prose" data-ch-theme="github-dark"><div class="ch-code-wrapper ch-code" data-ch-measured="false"><code class="ch-code-scroll-parent"><br><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>LANGFLOW_DATABASE_URL=&quot;postgresql://user:password@localhost:5432/dbname?sslmode=require&quot;</span></div></div><br></code></div></div>
+</li>
+<li>
+<p><strong><code>sslmode=verify-ca</code></strong>: Requires SSL and verifies the server certificate against the Certificate Authority (CA). Add the certificate paths to your connection string:</p>
+<div class="ch-codeblock not-prose" data-ch-theme="github-dark"><div class="ch-code-wrapper ch-code" data-ch-measured="false"><code class="ch-code-scroll-parent"><br><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>LANGFLOW_DATABASE_URL=&quot;postgresql://user@localhost:5432/dbname?sslmode=verify-ca&amp;sslcert=/path/to/client.crt&amp;sslkey=/path/to/client.key&amp;sslrootcert=/path/to/ca.crt&quot;</span></div></div><br></code></div></div>
+</li>
+<li>
+<p><strong><code>sslmode=verify-full</code></strong>: Requires SSL, verifies the server certificate, and checks the request hostname against the certificate hostname. The <code>db.example.com</code> hostname in this example must match the server certificate&#x27;s CN. This option is the most secure.</p>
+<div class="ch-codeblock not-prose" data-ch-theme="github-dark"><div class="ch-code-wrapper ch-code" data-ch-measured="false"><code class="ch-code-scroll-parent"><br><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>LANGFLOW_DATABASE_URL=&quot;postgresql://user@db.example.com:5432/dbname?sslmode=verify-full&amp;sslcert=/path/to/client.crt&amp;sslkey=/path/to/client.key&amp;sslrootcert=/path/to/ca.crt&quot;</span></div></div><br></code></div></div>
+<p>Do not use the Langflow environment variables <a href="/environment-variables#server"><code>LANGFLOW_SSL_CERT_FILE</code></a> and <a href="/environment-variables#server"><code>LANGFLOW_SSL_KEY_FILE</code></a> for your PostgreSQL certificates: these variables are for enabling HTTPS on the Langflow server, not for PostgreSQL database connections.</p>
+<p>For more on managing SSL certificates in PostgreSQL, see the <a href="https://www.postgresql.org/docs/9.1/ssl-tcp.html" target="_blank" rel="noopener noreferrer">PostgreSQL documentation</a>.</p>
+</li>
+</ul>
 </li>
 <li>
 <p>Save your changes, and then start Langflow with your <code>.env</code> file:</p>
 <div class="ch-codeblock not-prose" data-ch-theme="github-dark"><div class="ch-code-wrapper ch-code" data-ch-measured="false"><code class="ch-code-scroll-parent"><br><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>uv run langflow run --env-file .env</span></div></div><br></code></div></div>
+<p>For optional connection pooling and timeout settings, see <a href="/memory#configure-external-memory">Configure external memory</a>.</p>
 </li>
 <li>
 <p>In Langflow, run any flow to create traffic.</p>
@@ -109,6 +128,7 @@ This approach means you only have to manage deployment variables in one file, in
 <li>
 <p>Update your <code>.env</code> file with values for your PostgreSQL database:</p>
 <div class="ch-codeblock not-prose" data-ch-theme="github-dark"><div class="ch-code-wrapper ch-code" data-ch-measured="false"><code class="ch-code-scroll-parent"><br><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>POSTGRES_USER=langflow</span></div></div><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>POSTGRES_PASSWORD=your_secure_password</span></div></div><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>POSTGRES_DB=langflow</span></div></div><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>POSTGRES_HOST=postgres</span></div></div><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>POSTGRES_PORT=5432</span></div></div><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>LANGFLOW_CONFIG_DIR=app/langflow</span></div></div><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>LANGFLOW_PORT_1=7860</span></div></div><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>LANGFLOW_PORT_2=7861</span></div></div><div><span class="ch-code-line-number">_<!-- -->10</span><div style="display:inline-block;margin-left:16px"><span>LANGFLOW_HOST=0.0.0.0</span></div></div><br></code></div></div>
+<p>For optional connection pooling and timeout settings, see <a href="/memory#configure-external-memory">Configure external memory</a>.</p>
 </li>
 <li>
 <p>Reference these variables in your <code>docker-compose.yml</code>.
@@ -133,7 +153,7 @@ Your container name may vary.</p>
 Since each Langflow instance runs in its own container on the Docker network, using different incoming IP addresses confirms that both instances are actively connected to the PostgreSQL database.</p>
 </li>
 <li>
-<p>To quit psql, type <code>quit</code>.</p>
+<p>To quit <code>psql</code>, type <code>quit</code>.</p>
 </li>
 </ol>
 <h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="see-also">See also<a href="#see-also" class="hash-link" aria-label="Direct link to See also" title="Direct link to See also">​</a></h2>
